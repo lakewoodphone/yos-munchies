@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sign up for our WhatsApp updates</title>
+<meta name="description" content="Tap a message, add your name, send. That's it.">
+<meta name="theme-color" content="#075E54">
+<!--
+  ==========================================================================
+  EDIT ONLY THE CONFIG BLOCK BELOW (or better: run setup.py with her details).
+  ==========================================================================
+
+  HOW THIS WORKS
+  Each button is a "click to chat" link: https://wa.me/<number>?text=<message>
+  Tapping it opens WhatsApp with that message already typed but NOT sent.
+  The visitor replaces ___ with their name and taps send. She then receives
+  their name and their number as a normal WhatsApp message.
+-->
+<script>
+  window.CONFIG = {
+    businessName: "Yo's Munchies",
+    tagline: "Tap a message to get our updates",
+    phoneE164: "17327017757",
+    templates: [
+      { label: "Add me to your status updates", text: "Hi! My name is ___ — please add me to your WhatsApp status updates." },
+      { label: "I'd like to see your new stock", text: "Hi! My name is ___ — I'd like to see your new stock and updates." },
+      { label: "Please add me, I'm a customer", text: "Hi! My name is ___ — I'm a customer, please add me to your updates." },
+      { label: "Write something else", text: "Hi! My name is ___ —" }
+    ],
+    showSaveContact: true,
+    vcfFile: "contact.vcf",
+    vcfLabel: "Save our number"
+  };
+</script>
+<style>
+  :root{
+    --wa-dark:#075E54; --wa:#25D366; --wa-deep:#128C7E;
+    --ink:#101617; --muted:#5d6b6b; --line:#e3e9e8;
+    --card:#fff; --bg:#f3f6f5;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.5;
+    min-height:100vh; display:flex; flex-direction:column;
+    padding:20px 18px calc(24px + env(safe-area-inset-bottom));
+    max-width:520px; margin:0 auto;
+  }
+  header{text-align:center;margin:12px 0 20px}
+  .avatar{
+    width:74px;height:74px;border-radius:50%;margin:0 auto 13px;
+    background:linear-gradient(145deg,var(--wa),var(--wa-deep));
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-size:29px;font-weight:700;
+    box-shadow:0 6px 20px rgba(7,94,84,.22);
+  }
+  h1{font-size:22px;line-height:1.25;margin:0 0 6px;letter-spacing:-.4px}
+  .tagline{color:var(--muted);font-size:14.5px;margin:0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+  .card h2{font-size:15px;margin:0 0 3px;letter-spacing:-.2px}
+  .card p{margin:0 0 13px;color:var(--muted);font-size:13.5px}
+
+  .tmpl{
+    display:flex;align-items:center;gap:12px;width:100%;
+    padding:15px;margin-bottom:9px;font:inherit;font-size:15.5px;font-weight:600;
+    text-align:left;text-decoration:none;color:#04352c;background:var(--wa);
+    border:0;border-radius:13px;cursor:pointer;
+    transition:transform .08s ease;
+    box-shadow:0 3px 12px rgba(37,211,102,.28);
+  }
+  .tmpl:last-of-type{margin-bottom:0}
+  .tmpl:active{transform:scale(.985)}
+  .tmpl .txt{flex:1}
+  .tmpl .arrow{opacity:.55;font-size:19px;line-height:1}
+  .tmpl.ghost{background:#fff;color:var(--wa-dark);border:1.5px solid var(--line);box-shadow:none}
+
+  .steps{counter-reset:s;list-style:none;padding:0;margin:0}
+  .steps li{position:relative;padding-left:31px;margin-bottom:9px;font-size:14px;color:#374747}
+  .steps li:last-child{margin-bottom:0}
+  .steps li::before{
+    counter-increment:s;content:counter(s);position:absolute;left:0;top:1px;
+    width:20px;height:20px;border-radius:50%;background:var(--wa-dark);color:#fff;
+    font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;
+  }
+  .preview{
+    font-size:13px;color:var(--muted);background:#f6f9f8;border-left:3px solid var(--wa);
+    padding:9px 11px;border-radius:0 8px 8px 0;margin:0;
+  }
+  footer{margin-top:auto;padding-top:14px;text-align:center;color:#93a3a2;font-size:11.5px}
+  [hidden]{display:none !important}
+  @media (prefers-color-scheme:dark){
+    :root{--ink:#eef4f3;--muted:#9fb0ae;--line:#26302f;--card:#161d1c;--bg:#0e1413}
+    .tmpl.ghost{background:#161d1c;color:#7ee2a8}
+    .steps li{color:#c6d2d0}
+    .preview{background:#101716}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="avatar" id="avatar">?</div>
+  <h1 id="bizName">Business</h1>
+  <p class="tagline" id="tagline"></p>
+</header>
+
+<section class="card">
+  <h2>Choose a message</h2>
+  <p id="pickHint">Tap one — it opens WhatsApp with the message ready.</p>
+  <div id="templates"></div>
+</section>
+
+<section class="card">
+  <h2>What it looks like</h2>
+  <p class="preview" id="preview">Hi! My name is ___ — please add me to your status updates.</p>
+  <p style="margin:11px 0 0">Tap where the <strong>___</strong> is, type your name, and hit send.</p>
+</section>
+
+<section class="card" id="saveCard" hidden>
+  <h2>Step 2 — save our number</h2>
+  <p>WhatsApp only shows you someone's Status if you've saved their number. Tap below, then tap <strong>Save</strong> in the popup.</p>
+  <a class="tmpl ghost" id="saveBtn" href="#" download>
+    <span class="txt" id="saveLabel">Save our number</span><span class="arrow">↓</span>
+  </a>
+</section>
+
+<section class="card">
+  <h2>How it works</h2>
+  <ol class="steps">
+    <li>Pick a message above.</li>
+    <li>Type your name where the line is.</li>
+    <li>Send it. That's your sign-up.</li>
+    <li>Save our number so our daily status shows up for you.</li>
+  </ol>
+</section>
+
+<footer><span id="footBiz"></span> · You can leave any time</footer>
+
+<script>
+(function () {
+  var C = window.CONFIG || {};
+  var $ = function (id) { return document.getElementById(id); };
+  var PLACEHOLDER = /^1?0{9,11}$/;
+
+  var name = (C.businessName || "Business").trim();
+  document.title = "Sign up for " + name + " WhatsApp updates";
+  $("bizName").textContent = name;
+  $("avatar").textContent = name.charAt(0).toUpperCase();
+  $("tagline").textContent = C.tagline || "";
+  $("footBiz").textContent = name;
+
+  var waNumber = (C.phoneE164 || "").replace(/\D/g, "");
+  var configured = !!waNumber && !PLACEHOLDER.test(waNumber);
+
+  function waHref(text) {
+    return "https://wa.me/" + waNumber + (text ? "?text=" + encodeURIComponent(text) : "");
+  }
+
+  var wrap = $("templates");
+  var templates = C.templates || [];
+
+  if (!configured) {
+    var warn = document.createElement("p");
+    warn.className = "preview";
+    warn.innerHTML = "<strong>Setup needed:</strong> put the WhatsApp number in " +
+      "<code>CONFIG.phoneE164</code> (or run <code>python setup.py</code>) and these buttons go live.";
+    wrap.appendChild(warn);
+  } else {
+    templates.forEach(function (t, i) {
+      var a = document.createElement("a");
+      a.className = "tmpl";
+      a.href = waHref(t.text || "");
+      a.rel = "noopener";
+      var span = document.createElement("span");
+      span.className = "txt";
+      span.textContent = t.label || ("Message " + (i + 1));
+      var arrow = document.createElement("span");
+      arrow.className = "arrow";
+      arrow.textContent = "\u203A";
+      a.appendChild(span);
+      a.appendChild(arrow);
+      wrap.appendChild(a);
+      if (i === 0) { $("preview").textContent = t.text || ""; }
+    });
+  }
+
+  if (C.showSaveContact && C.vcfFile) {
+    $("saveCard").hidden = false;
+    $("saveBtn").href = C.vcfFile;
+    if (C.vcfLabel) { $("saveLabel").textContent = C.vcfLabel; }
+  }
+})();
+</script>
+</body>
+</html>
